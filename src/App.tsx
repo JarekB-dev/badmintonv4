@@ -440,7 +440,7 @@ function BadmintonManager() {
                 onClick={handleClearAllData}
                 className="w-full aspect-square flex items-center justify-center bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold"
               >
-                Clear Data
+                Clear All Data
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
