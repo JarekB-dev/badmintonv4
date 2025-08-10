@@ -419,7 +419,7 @@ function BadmintonManager() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               <button
                 onClick={() => setShowPlayersModal(true)}
-                className="w-full aspect-square flex items-center justify-center bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+                className="w-full aspect-square flex items-center justify-center bg-blue-500 text-white rounded-md hover:bg-blue-600 font-semibold"
               >
                 Players
               </button>
@@ -432,13 +432,13 @@ function BadmintonManager() {
               </button>
               <button
                 onClick={handleClearCourts}
-                className="w-full aspect-square flex items-center justify-center bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                className="w-full aspect-square flex items-center justify-center bg-gray-600 text-white rounded-md hover:bg-gray-700 font-semibold"
               >
                 Clear Courts
               </button>
               <button
                 onClick={handleClearAllData}
-                className="w-full aspect-square flex items-center justify-center bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                className="w-full aspect-square flex items-center justify-center bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold"
               >
                 Clear Data
               </button>
