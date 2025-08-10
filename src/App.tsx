@@ -428,26 +428,38 @@ function BadmintonManager() {
                 onClick={() => setShowPlayersModal(true)}
                 className="w-full aspect-square flex items-center justify-center bg-blue-500 text-white rounded-md hover:bg-blue-600 font-semibold"
               >
-                Players
+                <div className="flex flex-col items-center">
+                  <span className="text-xl">👤</span>
+                  <span className="mt-1">Players</span>
+                </div>
               </button>
               <button
                 onClick={handleShufflePlayers}
                 disabled={isShuffling || activePlayers.length === 0}
                 className="w-full aspect-square flex items-center justify-center bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
-                {isShuffling ? "🔄 Shuffling..." : "Shuffle"}
+                <div className="flex flex-col items-center">
+                  <span className="text-xl">{isShuffling ? "🔄" : "🔀"}</span>
+                  <span className="mt-1">{isShuffling ? "Shuffling..." : "Shuffle"}</span>
+                </div>
               </button>
               <button
                 onClick={handleClearCourts}
                 className="w-full aspect-square flex items-center justify-center bg-gray-600 text-white rounded-md hover:bg-gray-700 font-semibold"
               >
-                Clear Courts
+                <div className="flex flex-col items-center">
+                  <span className="text-xl">🧹</span>
+                  <span className="mt-1">Clear Courts</span>
+                </div>
               </button>
               <button
                 onClick={handleClearAllData}
                 className="w-full aspect-square flex items-center justify-center bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold"
               >
-                Clear All Data
+                <div className="flex flex-col items-center">
+                  <span className="text-xl">🗑️</span>
+                  <span className="mt-1">Clear All Data</span>
+                </div>
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
