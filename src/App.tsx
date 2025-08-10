@@ -168,6 +168,7 @@ function BadmintonManager() {
         ...p,
         sitOutCount: p.sitOutCount || 0,
         isPaused: p.isPaused || false,
+        isSaved: p.isSaved ?? true,
       }))
     );
     setCourtAssignments(storage.get(STORAGE_KEYS.courtAssignments, []));
@@ -179,7 +180,10 @@ function BadmintonManager() {
   }, []);
 
   useEffect(() => {
-    storage.set(STORAGE_KEYS.players, players);
+    storage.set(
+      STORAGE_KEYS.players,
+      players.filter(p => p.isSaved)
+    );
   }, [players]);
 
   useEffect(() => {
@@ -235,7 +239,8 @@ function BadmintonManager() {
       name: newPlayerName.trim(),
       isActive: true,
       isPaused: false,
-      sitOutCount: 0
+      sitOutCount: 0,
+      isSaved: false
     };
 
     setPlayers(prev => [...prev, newPlayer]);
@@ -257,6 +262,7 @@ function BadmintonManager() {
       name: newPlayerName.trim(),
       isActive: false,
       isPaused: false,
+      isSaved: false,
       sitOutCount: 0
     };
 
@@ -511,11 +517,13 @@ function BadmintonManager() {
 
   const handleClearAllData = () => {
     setPlayers(currentPlayers =>
-      currentPlayers.map(player => ({
-        ...player,
-        isActive: false,
-        isPaused: false,
-        sitOutCount: 0
+      currentPlayers
+        .filter(player => player.isSaved)
+        .map(player => ({
+          ...player,
+          isActive: false,
+          isPaused: false,
+          sitOutCount: 0
       }))
     );
     setSittingOutPlayerIds([]);
@@ -531,7 +539,7 @@ function BadmintonManager() {
     <>
       {showPlayersModal && (
         <PlayersModal
-          players={players}
+          players={players.filter(p => p.isSaved)}
           handleTogglePlayer={handleTogglePlayer}
           handleRemovePlayer={handleRemovePlayer}
           onClose={() => setShowPlayersModal(false)}
