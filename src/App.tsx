@@ -262,7 +262,7 @@ function BadmintonManager() {
       name: newPlayerName.trim(),
       isActive: false,
       isPaused: false,
-      isSaved: false,
+      isSaved: true,
       sitOutCount: 0
     };
 
