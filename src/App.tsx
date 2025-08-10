@@ -480,11 +480,10 @@ function BadmintonManager() {
   };
 
   const handleClearAllData = () => {
-    setPlayers([]);
+    setPlayers(prev => prev.map(p => ({ ...p, isActive: false, sitOutCount: 0 })));
     setSittingOutPlayerIds([]);
     setCourtAssignments([]);
     setPartnerships([]);
-    localStorage.removeItem(STORAGE_KEYS.players);
     localStorage.removeItem(STORAGE_KEYS.courtAssignments);
     localStorage.removeItem(STORAGE_KEYS.partnerships);
     localStorage.removeItem(STORAGE_KEYS.sittingOutPlayers);
