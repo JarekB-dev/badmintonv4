@@ -167,7 +167,10 @@ function BadmintonManager() {
   useEffect(() => {
     setPlayers(storage.get(STORAGE_KEYS.players, []));
     setCourtAssignments(storage.get(STORAGE_KEYS.courtAssignments, []));
-    setPartnerships(storage.get(STORAGE_KEYS.partnerships, []));
+    const storedPartnerships = storage.get(STORAGE_KEYS.partnerships, [] as Partnership[]);
+    setPartnerships(
+      storedPartnerships.map(p => ({ ...p, lastSessions: p.lastSessions || [] }))
+    );
   }, []);
 
   useEffect(() => {
@@ -269,19 +272,28 @@ function BadmintonManager() {
     return partnership?.timesPlayed || 0;
   };
 
-  const updatePartnership = (p1Id: string, p2Id: string) => {
+  const updatePartnership = (p1Id: string, p2Id: string, sessionId: string) => {
     setPartnerships(prev => {
-      const existing = prev.find(p => 
+      const existing = prev.find(p =>
         (p.player1Id === p1Id && p.player2Id === p2Id) ||
         (p.player1Id === p2Id && p.player2Id === p1Id)
       );
 
       if (existing) {
-        return prev.map(p => 
-          p === existing ? { ...p, timesPlayed: p.timesPlayed + 1 } : p
+        return prev.map(p =>
+          p === existing
+            ? {
+                ...p,
+                timesPlayed: p.timesPlayed + 1,
+                lastSessions: [...(p.lastSessions || []), sessionId].slice(-3),
+              }
+            : p
         );
       } else {
-        return [...prev, { player1Id: p1Id, player2Id: p2Id, timesPlayed: 1 }];
+        return [
+          ...prev,
+          { player1Id: p1Id, player2Id: p2Id, timesPlayed: 1, lastSessions: [sessionId] },
+        ];
       }
     });
   };
@@ -303,20 +315,54 @@ function BadmintonManager() {
         const bPartnerships = partnerships.filter(p => p.player1Id === b.id || p.player2Id === b.id).length;
         return aPartnerships - bPartnerships;
       });
+
+      const recentSessionIds = Array.from(
+        new Set(partnerships.flatMap(p => p.lastSessions))
+      )
+        .sort(
+          (a, b) => parseInt(b.split("_")[1]) - parseInt(a.split("_")[1])
+        )
+        .slice(0, 3);
       
       for (const player1 of sortedPlayers) {
         if (usedPlayers.has(player1.id)) continue;
         
-        let bestPartner = null;
+        let bestPartner: Player | null = null;
         let minPartnerships = Infinity;
         
         for (const player2 of sortedPlayers) {
           if (usedPlayers.has(player2.id) || player1.id === player2.id) continue;
           
-          const partnershipCount = getPartnershipCount(player1.id, player2.id);
+          const existing = partnerships.find(
+            p =>
+              (p.player1Id === player1.id && p.player2Id === player2.id) ||
+              (p.player1Id === player2.id && p.player2Id === player1.id)
+          );
+
+          if (
+            existing &&
+            existing.lastSessions.some(id => recentSessionIds.includes(id))
+          ) {
+            continue;
+          }
+
+          const partnershipCount = existing?.timesPlayed || 0;
           if (partnershipCount < minPartnerships) {
             minPartnerships = partnershipCount;
             bestPartner = player2;
+          }
+        }
+
+        // Fallback: if no partner found due to recent sessions, ignore session check
+        if (!bestPartner) {
+          minPartnerships = Infinity;
+          for (const player2 of sortedPlayers) {
+            if (usedPlayers.has(player2.id) || player1.id === player2.id) continue;
+            const partnershipCount = getPartnershipCount(player1.id, player2.id);
+            if (partnershipCount < minPartnerships) {
+              minPartnerships = partnershipCount;
+              bestPartner = player2;
+            }
           }
         }
         
@@ -356,7 +402,7 @@ function BadmintonManager() {
         
         for (let i = 0; i < courtPlayers.length; i++) {
           for (let j = i + 1; j < courtPlayers.length; j++) {
-            updatePartnership(courtPlayers[i].id, courtPlayers[j].id);
+            updatePartnership(courtPlayers[i].id, courtPlayers[j].id, sessionId);
           }
         }
       }
