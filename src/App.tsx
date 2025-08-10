@@ -2,6 +2,7 @@ import { Toaster, toast } from "sonner";
 import { useState, useEffect } from "react";
 import PlayersModal from "./PlayersModal";
 import SittingOutTable from "./SittingOutTable";
+import type { Player } from "./types/Player";
 
 const STORAGE_KEYS = {
   players: 'badminton-players',
@@ -9,12 +10,6 @@ const STORAGE_KEYS = {
   partnerships: 'badminton-partnerships',
   sittingOutPlayers: 'badminton-sitting-out-players'
 };
-
-interface Player {
-  id: string;
-  name: string;
-  isActive: boolean;
-}
 
 interface CourtAssignment {
   courtNumber: number;
