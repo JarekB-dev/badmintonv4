@@ -1,10 +1,5 @@
 import React from "react";
-
-interface Player {
-  id: string;
-  name: string;
-  isActive: boolean;
-}
+import type { Player } from "./types/Player";
 
 interface SittingOutTableProps {
   players: Player[];
