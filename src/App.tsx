@@ -316,7 +316,13 @@ function BadmintonManager() {
 
     setIsShuffling(true);
 
-    const assignPlayersToTeams = (playerList: Player[]) => {
+    const recentSessionIds = [...new Set(courtAssignments.map(a => a.sessionId))].slice(-3);
+
+    const assignPlayersToTeams = (
+      playerList: Player[],
+      sortedPlayers: Player[],
+      recentSessionIds: string[],
+    ) => {
       const teams: Array<[Player, Player]> = [];
       const usedPlayers = new Set<string>();
       
@@ -384,7 +390,15 @@ function BadmintonManager() {
 
     const orderedPlayers = [...sidelinedPlayers, ...remainingPlayers];
 
-    const teams = assignPlayersToTeams(orderedPlayers);
+    const sortedPlayers = [...orderedPlayers].sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+
+    const teams = assignPlayersToTeams(
+      orderedPlayers,
+      sortedPlayers,
+      recentSessionIds,
+    );
     
     const shuffledTeams = [...teams];
     for (let i = shuffledTeams.length - 1; i > 0; i--) {
