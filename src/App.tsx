@@ -251,8 +251,14 @@ function BadmintonManager() {
   };
 
   const handleTogglePlayer = (playerId: string) => {
-    setPlayers(prev => prev.map(p => 
+    setPlayers(prev => prev.map(p =>
       p.id === playerId ? { ...p, isActive: !p.isActive } : p
+    ));
+  };
+
+  const handleDeactivatePlayer = (playerId: string) => {
+    setPlayers(prev => prev.map(p =>
+      p.id === playerId ? { ...p, isActive: false } : p
     ));
   };
 
@@ -462,6 +468,12 @@ function BadmintonManager() {
                       className="px-2 py-1 text-xs bg-yellow-500 text-white rounded hover:bg-yellow-600"
                     >
                       Pause
+                    </button>
+                    <button
+                      onClick={() => handleDeactivatePlayer(player.id)}
+                      className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
+                    >
+                      Save
                     </button>
                     <button
                       onClick={() => handleRemovePlayer(player.id)}
