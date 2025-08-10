@@ -546,7 +546,7 @@ function BadmintonManager() {
               >
                 <div className="flex flex-col items-center">
                   <span className="text-5xl">🗑️</span>
-                  <span className="mt-1 text-xs">Clear All Data</span>
+                  <span className="mt-1 text-xs">Clear Data</span>
                 </div>
               </button>
             </div>
