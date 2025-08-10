@@ -268,10 +268,33 @@ function BadmintonManager() {
     toast.success("Player removed!");
   };
 
+  const stripPlayerFromCourts = (
+    assignments: CourtAssignment[],
+    playerId: string,
+  ): CourtAssignment[] =>
+    assignments
+      .map(assignment => ({
+        ...assignment,
+        playerIds: assignment.playerIds.filter(id => id !== playerId),
+      }))
+      .filter(assignment => assignment.playerIds.length > 0);
+
   const handleTogglePlayer = (playerId: string) => {
-    setPlayers(prev => prev.map(p =>
-      p.id === playerId ? { ...p, isActive: !p.isActive } : p
-    ));
+    const wasActive = players.find(p => p.id === playerId)?.isActive;
+
+    setPlayers(prev =>
+      prev.map(p =>
+        p.id === playerId ? { ...p, isActive: !p.isActive } : p
+      )
+    );
+
+    if (wasActive) {
+      const updatedAssignments = stripPlayerFromCourts(
+        courtAssignments,
+        playerId,
+      );
+      setCourtAssignments(updatedAssignments);
+    }
   };
 
   const handleDeactivatePlayer = (playerId: string) => {
