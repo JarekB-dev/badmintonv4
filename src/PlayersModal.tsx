@@ -1,11 +1,5 @@
 import React from "react";
-
-interface Player {
-  id: string;
-  name: string;
-  isActive: boolean;
-  sitOutCount: number;
-}
+import type { Player } from "./types/Player";
 
 interface PlayersModalProps {
   players: Player[];
