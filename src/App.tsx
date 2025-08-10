@@ -225,6 +225,26 @@ function BadmintonManager() {
     toast.success("Player added successfully!");
   };
 
+  const handleSavePlayer = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!newPlayerName.trim()) return;
+
+    if (players.some(p => p.name.toLowerCase() === newPlayerName.trim().toLowerCase())) {
+      toast.error("Player with this name already exists");
+      return;
+    }
+
+    const newPlayer: Player = {
+      id: `player_${Date.now()}_${Math.random()}`,
+      name: newPlayerName.trim(),
+      isActive: false
+    };
+
+    setPlayers(prev => [...prev, newPlayer]);
+    setNewPlayerName("");
+    toast.success("Player saved successfully!");
+  };
+
   const handleRemovePlayer = (playerId: string) => {
     setPlayers(prev => prev.filter(p => p.id !== playerId));
     setPartnerships(prev => prev.filter(p => p.player1Id !== playerId && p.player2Id !== playerId));
@@ -385,6 +405,14 @@ function BadmintonManager() {
               >
                 Add
               </button>
+              <button
+                type="button"
+                onClick={handleSavePlayer}
+                disabled={!newPlayerName.trim()}
+                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save
+              </button>
             </div>
           </form>
 
@@ -447,35 +475,6 @@ function BadmintonManager() {
               ))}
             </div>
           </div>
-
-          {inactivePlayers.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3 text-gray-700">
-                ⏸️ Inactive Players ({inactivePlayers.length})
-              </h3>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
-                {inactivePlayers.map((player) => (
-                  <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <span className="text-gray-600">{player.name}</span>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => handleTogglePlayer(player.id)}
-                        className="px-2 py-1 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600"
-                      >
-                        Play
-                      </button>
-                      <button
-                        onClick={() => handleRemovePlayer(player.id)}
-                        className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
