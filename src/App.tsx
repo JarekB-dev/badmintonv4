@@ -386,6 +386,7 @@ function BadmintonManager() {
         <PlayersModal
           players={players}
           handleTogglePlayer={handleTogglePlayer}
+          handleRemovePlayer={handleRemovePlayer}
           onClose={() => setShowPlayersModal(false)}
         />
       )}
@@ -395,13 +396,13 @@ function BadmintonManager() {
           <h2 className="text-2xl font-bold mb-4 text-gray-800">🏸 Player Management</h2>
           
           <form onSubmit={handleAddPlayer} className="mb-6">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap sm:flex-nowrap gap-2">
               <input
                 type="text"
                 value={newPlayerName}
                 onChange={(e) => setNewPlayerName(e.target.value)}
                 placeholder="Enter player name"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="submit"
