@@ -184,7 +184,6 @@ function BadmintonManager() {
   }, [partnerships]);
 
   const activePlayers = players.filter(p => p.isActive);
-  const inactivePlayers = players.filter(p => !p.isActive);
 
   const getCurrentCourtAssignments = (): CourtWithPlayers[] => {
     if (courtAssignments.length === 0) return [];
