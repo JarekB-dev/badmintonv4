@@ -13,15 +13,18 @@ interface PlayersModalProps {
   onClose: () => void;
 }
 
-export default function PlayersModal({ players, handleTogglePlayer, handleRemovePlayer, onClose }: PlayersModalProps) {
-
-  
+export default function PlayersModal({
+  players,
+  handleTogglePlayer,
+  handleRemovePlayer,
+  onClose,
+}: PlayersModalProps) { 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg p-6 w-full max-w-md">
         <h2 className="text-xl font-bold mb-4 text-gray-800">Players</h2>
         <div className="space-y-2 max-h-60 overflow-y-auto">
-          {players.map(player => (
+          {players.map((player) => (
             <div
               key={player.id}
               className="flex items-center justify-between p-2 bg-gray-50 rounded"
@@ -30,9 +33,14 @@ export default function PlayersModal({ players, handleTogglePlayer, handleRemove
               <div className="flex gap-2">
                 <button
                   onClick={() => handleTogglePlayer(player.id)}
-                  className="px-2 py-1 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600"
+                  className={`px-2 py-1 text-xs rounded ${
+                    player.isActive
+                      ? "bg-emerald-200 text-emerald-700 cursor-not-allowed"
+                      : "bg-emerald-500 text-white hover:bg-emerald-600"
+                  }`}
+                  disabled={player.isActive}
                 >
-                  Activate
+                  {player.isActive ? "Activated" : "Activate"}
                 </button>
                 <button
                   onClick={() => handleRemovePlayer(player.id)}
