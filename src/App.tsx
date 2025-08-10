@@ -551,7 +551,7 @@ function BadmintonManager() {
           <h2 className="text-2xl font-bold mb-4 text-gray-800">🏸 Player Management</h2>
           
           <form onSubmit={handleAddPlayer} className="mb-6">
-            <div className="flex flex-wrap sm:flex-nowrap gap-2">
+            <div className="flex items-stretch gap-2 mb-2">
               <input
                 type="text"
                 name="playerName"
@@ -562,9 +562,18 @@ function BadmintonManager() {
                 className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
+                type="button"
+                onClick={() => setShowPlayersModal(true)}
+                className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center justify-center"
+              >
+                <span className="text-2xl" role="img" aria-label="players">👤</span>
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <button
                 type="submit"
                 disabled={!newPlayerName.trim()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add
               </button>
@@ -572,7 +581,7 @@ function BadmintonManager() {
                 type="button"
                 onClick={handleSavePlayer}
                 disabled={!newPlayerName.trim()}
-                className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save
               </button>
@@ -580,16 +589,7 @@ function BadmintonManager() {
           </form>
 
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button
-                onClick={() => setShowPlayersModal(true)}
-                className="w-full aspect-square flex items-center justify-center bg-blue-500 text-white rounded-md hover:bg-blue-600 font-semibold"
-              >
-                <div className="flex flex-col items-center">
-                  <span className="text-5xl">👤</span>
-                  <span className="mt-1 text-xs">Players</span>
-                </div>
-              </button>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               <button
                 onClick={handleShufflePlayers}
                 disabled={isShuffling || activePlayers.length === 0}
@@ -619,7 +619,7 @@ function BadmintonManager() {
                 </div>
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-2 text-center">
+          <p className="text-xs text-gray-500 mt-2 text-center">
               {activePlayers.length} active players • Smart pairing enabled
             </p>
           </div>
