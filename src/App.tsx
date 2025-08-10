@@ -61,8 +61,7 @@ function Content() {
     <div className="max-w-7xl mx-auto">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-4">🏸 Badminton Court Manager</h1>
-        <p className="text-xl text-gray-600">Organize your badminton matches with ease</p>
-        <p className="text-sm text-gray-500 mt-2">✨ Local version - all data stored in your browser</p>
+        <p className="text-xl text-gray-600">Organize your badminton matches with ease, so Bren doesn't have to..</p>
       </div>
       <BadmintonManager />
     </div>
