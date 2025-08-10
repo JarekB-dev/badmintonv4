@@ -211,7 +211,7 @@ function BadmintonManager() {
   const playingPlayerIds = new Set(
     currentCourts.flatMap(court => court.players.map(p => p.id))
   );
-  const sittingOutPlayers = activePlayers.filter(player => !playingPlayerIds.has(player.id));
+  const sittingOutPlayers = players.filter(player => !playingPlayerIds.has(player.id));
 
   useEffect(() => {
     setSittingOutPlayerIds(sittingOutPlayers.map(p => p.id));
@@ -552,32 +552,35 @@ function BadmintonManager() {
             </p>
           </div>
 
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-gray-700">
-              ✅ Active Players ({activePlayers.length})
-            </h3>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {activePlayers.map((player) => (
-                <div key={player.id} className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                  <span className="font-medium text-gray-800">{player.name}</span>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => handleTogglePlayer(player.id)}
-                      className="px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                    >
-                      Pause
-                    </button>
-                    <button
-                      onClick={() => handleRemovePlayer(player.id)}
-                      className="px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
-                    >
-                      ✕
-                    </button>
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-3 text-gray-700">
+                ✅ Active Players ({activePlayers.length})
+              </h3>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {activePlayers.map((player) => (
+                  <div
+                    key={player.id}
+                    className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200"
+                  >
+                    <span className="font-medium text-gray-800">{player.name}</span>
+                    <div className="flex gap-1">
+                      <button
+                        onClick={() => handleTogglePlayer(player.id)}
+                        className="px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      >
+                        Pause
+                      </button>
+                      <button
+                        onClick={() => handleRemovePlayer(player.id)}
+                        className="px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
+                      >
+                        ✕
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
         </div>
       </div>
 
@@ -602,20 +605,26 @@ function BadmintonManager() {
           {sittingOutPlayers.length > 0 && (
             <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
               <h3 className="text-lg font-semibold mb-3 text-orange-800">🪑 Sitting Out ({sittingOutPlayers.length})</h3>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-2">
                 {sittingOutPlayers.map((player) => (
                   <div
                     key={player.id}
-                    title={`Sat out ${player.sitOutCount} times`}
-                    className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium text-center"
+                    className="flex items-center justify-between bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium"
                   >
-                    {player.name}
-                    <span className="text-xs ml-1">({player.sitOutCount})</span>
+                    <span>{player.name}</span>
+                    {!player.isActive && (
+                      <button
+                        onClick={() => handleTogglePlayer(player.id)}
+                        className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                      >
+                        Resume
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
               <p className="text-orange-700 text-xs mt-2">
-                These players will be included in the next shuffle
+                Waiting players will join the next shuffle. Paused players can be resumed when ready.
               </p>
             </div>
           )}
