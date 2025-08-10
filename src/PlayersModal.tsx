@@ -9,10 +9,11 @@ interface Player {
 interface PlayersModalProps {
   players: Player[];
   handleTogglePlayer: (id: string) => void;
+  handleRemovePlayer: (id: string) => void;
   onClose: () => void;
 }
 
-export default function PlayersModal({ players, handleTogglePlayer, onClose }: PlayersModalProps) {
+export default function PlayersModal({ players, handleTogglePlayer, handleRemovePlayer, onClose }: PlayersModalProps) {
 
   
   return (
@@ -26,21 +27,36 @@ export default function PlayersModal({ players, handleTogglePlayer, onClose }: P
               className="flex items-center justify-between p-2 bg-gray-50 rounded"
             >
               <span className="text-gray-700">{player.name}</span>
-              {player.isActive ? (
+              <div className="flex gap-2">
+                {player.isActive ? (
+                  <button
+                    disabled
+                    className="px-2 py-1 text-xs bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+                  >
+                    Activated
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleTogglePlayer(player.id)}
+                    className="px-2 py-1 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600"
+                  >
+                    Activated
+                  </button>
+                )}
                 <button
-                  disabled
-                  className="px-2 py-1 text-xs bg-gray-300 text-gray-500 rounded cursor-not-allowed"
+                  onClick={() => handleRemovePlayer(player.id)}
+                  className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
                 >
-                  Activated
+                  Activate
                 </button>
               ) : (
                 <button
                   onClick={() => handleTogglePlayer(player.id)}
                   className="px-2 py-1 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600"
                 >
-                  Activate
+                  X
                 </button>
-              )}
+              </div>
             </div>
           ))}
         </div>
