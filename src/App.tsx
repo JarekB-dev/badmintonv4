@@ -644,7 +644,7 @@ function BadmintonManager() {
                       </button>
                       <button
                         onClick={() => handleRemovePlayer(player.id)}
-                        className="px-3 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
+                        className="px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
                       >
                         ✕
                       </button>
