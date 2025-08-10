@@ -5,7 +5,8 @@ import PlayersModal from "./PlayersModal";
 const STORAGE_KEYS = {
   players: 'badminton-players',
   courtAssignments: 'badminton-court-assignments',
-  partnerships: 'badminton-partnerships'
+  partnerships: 'badminton-partnerships',
+  sittingOutPlayers: 'badminton-sitting-out-players'
 };
 
 interface Player {
@@ -162,7 +163,7 @@ function BadmintonManager() {
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isShuffling, setIsShuffling] = useState(false);
   const [showPlayersModal, setShowPlayersModal] = useState(false);
-
+  const [sittingOutPlayerIds, setSittingOutPlayerIds] = useState<string[]>([]);
 
   useEffect(() => {
     setPlayers(storage.get(STORAGE_KEYS.players, []));
@@ -171,6 +172,7 @@ function BadmintonManager() {
     setPartnerships(
       storedPartnerships.map(p => ({ ...p, lastSessions: p.lastSessions || [] }))
     );
+    setSittingOutPlayerIds(storage.get(STORAGE_KEYS.sittingOutPlayers, []));
   }, []);
 
   useEffect(() => {
@@ -184,6 +186,10 @@ function BadmintonManager() {
   useEffect(() => {
     storage.set(STORAGE_KEYS.partnerships, partnerships);
   }, [partnerships]);
+
+  useEffect(() => {
+    storage.set(STORAGE_KEYS.sittingOutPlayers, sittingOutPlayerIds);
+  }, [sittingOutPlayerIds]);
 
   const activePlayers = players.filter(p => p.isActive);
 
@@ -205,6 +211,10 @@ function BadmintonManager() {
     currentCourts.flatMap(court => court.players.map(p => p.id))
   );
   const sittingOutPlayers = activePlayers.filter(player => !playingPlayerIds.has(player.id));
+
+  useEffect(() => {
+    setSittingOutPlayerIds(sittingOutPlayers.map(p => p.id));
+  }, [players, courtAssignments]);
 
   const handleAddPlayer = (e: React.FormEvent) => {
     e.preventDefault();
@@ -310,27 +320,13 @@ function BadmintonManager() {
       const teams: Array<[Player, Player]> = [];
       const usedPlayers = new Set<string>();
       
-      const sortedPlayers = [...playerList].sort((a, b) => {
-        const aPartnerships = partnerships.filter(p => p.player1Id === a.id || p.player2Id === a.id).length;
-        const bPartnerships = partnerships.filter(p => p.player1Id === b.id || p.player2Id === b.id).length;
-        return aPartnerships - bPartnerships;
-      });
-
-      const recentSessionIds = Array.from(
-        new Set(partnerships.flatMap(p => p.lastSessions))
-      )
-        .sort(
-          (a, b) => parseInt(b.split("_")[1]) - parseInt(a.split("_")[1])
-        )
-        .slice(0, 3);
-      
-      for (const player1 of sortedPlayers) {
+      for (const player1 of playerList) {
         if (usedPlayers.has(player1.id)) continue;
         
         let bestPartner: Player | null = null;
         let minPartnerships = Infinity;
         
-        for (const player2 of sortedPlayers) {
+        for (const player2 of playerList) {
           if (usedPlayers.has(player2.id) || player1.id === player2.id) continue;
           
           const existing = partnerships.find(
@@ -376,7 +372,19 @@ function BadmintonManager() {
       return teams;
     };
 
-    const teams = assignPlayersToTeams(activePlayers);
+    const sidelinedPlayers = sittingOutPlayerIds
+      .map(id => activePlayers.find(p => p.id === id))
+      .filter(Boolean) as Player[];
+    const remainingPlayers = activePlayers.filter(p => !sittingOutPlayerIds.includes(p.id));
+
+    for (let i = remainingPlayers.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [remainingPlayers[i], remainingPlayers[j]] = [remainingPlayers[j], remainingPlayers[i]];
+    }
+
+    const orderedPlayers = [...sidelinedPlayers, ...remainingPlayers];
+
+    const teams = assignPlayersToTeams(orderedPlayers);
     
     const shuffledTeams = [...teams];
     for (let i = shuffledTeams.length - 1; i > 0; i--) {
