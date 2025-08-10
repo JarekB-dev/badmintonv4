@@ -480,7 +480,13 @@ function BadmintonManager() {
   };
 
   const handleClearAllData = () => {
-    setPlayers(prev => prev.map(p => ({ ...p, isActive: false, sitOutCount: 0 })));
+    setPlayers(currentPlayers =>
+      currentPlayers.map(player => ({
+        ...player,
+        isActive: false,
+        sitOutCount: 0
+      }))
+    );
     setSittingOutPlayerIds([]);
     setCourtAssignments([]);
     setPartnerships([]);
