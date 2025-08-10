@@ -213,7 +213,7 @@ function BadmintonManager() {
     currentCourts.flatMap(court => court.players.map(p => p.id))
   );
   const sittingOutPlayers = players.filter(
-    p => !playingPlayerIds.has(p.id) && !p.isActive
+    p => !playingPlayerIds.has(p.id)
   );
 
   useEffect(() => {
