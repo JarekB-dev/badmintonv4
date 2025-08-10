@@ -163,7 +163,13 @@ function BadmintonManager() {
 
   useEffect(() => {
     const storedPlayers = storage.get(STORAGE_KEYS.players, [] as Player[]);
-    setPlayers(storedPlayers.map(p => ({ ...p, sitOutCount: p.sitOutCount || 0 })));
+    setPlayers(
+      storedPlayers.map(p => ({
+        ...p,
+        sitOutCount: p.sitOutCount || 0,
+        isPaused: p.isPaused || false,
+      }))
+    );
     setCourtAssignments(storage.get(STORAGE_KEYS.courtAssignments, []));
     const storedPartnerships = storage.get(STORAGE_KEYS.partnerships, [] as Partnership[]);
     setPartnerships(
@@ -188,7 +194,7 @@ function BadmintonManager() {
     storage.set(STORAGE_KEYS.sittingOutPlayers, sittingOutPlayerIds);
   }, [sittingOutPlayerIds]);
 
-  const activePlayers = players.filter(p => p.isActive);
+  const activePlayers = players.filter(p => p.isActive && !p.isPaused);
 
   const getCurrentCourtAssignments = (): CourtWithPlayers[] => {
     if (courtAssignments.length === 0) return [];
@@ -208,7 +214,7 @@ function BadmintonManager() {
     currentCourts.flatMap(court => court.players.map(p => p.id))
   );
   const sittingOutPlayers = players.filter(
-    p => !playingPlayerIds.has(p.id) && p.isActive
+    p => !playingPlayerIds.has(p.id) && (p.isActive || p.isPaused)
   );
 
   useEffect(() => {
@@ -228,6 +234,7 @@ function BadmintonManager() {
       id: `player_${Date.now()}_${Math.random()}`,
       name: newPlayerName.trim(),
       isActive: true,
+      isPaused: false,
       sitOutCount: 0
     };
 
@@ -249,6 +256,7 @@ function BadmintonManager() {
       id: `player_${Date.now()}_${Math.random()}`,
       name: newPlayerName.trim(),
       isActive: false,
+      isPaused: false,
       sitOutCount: 0
     };
 
@@ -279,7 +287,9 @@ function BadmintonManager() {
 
     setPlayers(prev =>
       prev.map(p =>
-        p.id === playerId ? { ...p, isActive: !p.isActive } : p
+        p.id === playerId
+          ? { ...p, isActive: !p.isActive, isPaused: false }
+          : p
       )
     );
 
@@ -292,10 +302,30 @@ function BadmintonManager() {
     }
   };
 
+  const handlePausePlayer = (playerId: string) => {
+    const wasPaused = players.find(p => p.id === playerId)?.isPaused;
+
+    setPlayers(prev =>
+      prev.map(p =>
+        p.id === playerId ? { ...p, isPaused: !p.isPaused } : p
+      )
+    );
+
+    if (!wasPaused) {
+      const updatedAssignments = stripPlayerFromCourts(
+        courtAssignments,
+        playerId,
+      );
+      setCourtAssignments(updatedAssignments);
+    }
+  };
+
   const handleDeactivatePlayer = (playerId: string) => {
-    setPlayers(prev => prev.map(p =>
-      p.id === playerId ? { ...p, isActive: false } : p
-    ));
+    setPlayers(prev =>
+      prev.map(p =>
+        p.id === playerId ? { ...p, isActive: false, isPaused: false } : p
+      )
+    );
   };
 
   const getPartnershipCount = (p1Id: string, p2Id: string): number => {
@@ -484,6 +514,7 @@ function BadmintonManager() {
       currentPlayers.map(player => ({
         ...player,
         isActive: false,
+        isPaused: false,
         sitOutCount: 0
       }))
     );
@@ -596,7 +627,7 @@ function BadmintonManager() {
                     <span className="font-medium text-gray-800">{player.name}</span>
                     <div className="flex gap-1">
                       <button
-                        onClick={() => handleTogglePlayer(player.id)}
+                        onClick={() => handlePausePlayer(player.id)}
                         className="px-3 py-2 text-sm bg-yellow-500 text-white rounded hover:bg-yellow-600"
                       >
                         Pause
@@ -636,7 +667,7 @@ function BadmintonManager() {
           {sittingOutPlayers.length > 0 && (
             <SittingOutTable
               players={sittingOutPlayers}
-              handleTogglePlayer={handleTogglePlayer}
+              handlePausePlayer={handlePausePlayer}
             />
           )}
         </div>
