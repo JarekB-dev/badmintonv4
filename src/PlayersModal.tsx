@@ -28,33 +28,17 @@ export default function PlayersModal({ players, handleTogglePlayer, handleRemove
             >
               <span className="text-gray-700">{player.name}</span>
               <div className="flex gap-2">
-                {player.isActive ? (
-                  <button
-                    disabled
-                    className="px-2 py-1 text-xs bg-gray-300 text-gray-500 rounded cursor-not-allowed"
-                  >
-                    Activated
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleTogglePlayer(player.id)}
-                    className="px-2 py-1 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600"
-                  >
-                    Activated
-                  </button>
-                )}
-                <button
-                  onClick={() => handleRemovePlayer(player.id)}
-                  className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Activate
-                </button>
-              ) : (
                 <button
                   onClick={() => handleTogglePlayer(player.id)}
                   className="px-2 py-1 text-xs bg-emerald-500 text-white rounded hover:bg-emerald-600"
                 >
-                  X
+                  Activate
+                </button>
+                <button
+                  onClick={() => handleRemovePlayer(player.id)}
+                  className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Delete
                 </button>
               </div>
             </div>
