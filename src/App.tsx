@@ -416,31 +416,31 @@ function BadmintonManager() {
           </form>
 
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <div className="flex flex-col gap-2">
-               <button
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
                 onClick={() => setShowPlayersModal(true)}
-                className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+                className="w-full aspect-square flex items-center justify-center bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
               >
                 Players
               </button>
               <button
                 onClick={handleShufflePlayers}
                 disabled={isShuffling || activePlayers.length === 0}
-                className="w-full px-4 py-3 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                className="w-full aspect-square flex items-center justify-center bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
-                {isShuffling ? "🔄 Shuffling..." : "🎲 Shuffle Players"}
+                {isShuffling ? "🔄 Shuffling..." : "Shuffle"}
               </button>
               <button
                 onClick={handleClearCourts}
-                className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
+                className="w-full aspect-square flex items-center justify-center bg-gray-600 text-white rounded-md hover:bg-gray-700 text-sm"
               >
-                Clear All Courts
+                Clear Courts
               </button>
               <button
                 onClick={handleClearAllData}
-                className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                className="w-full aspect-square flex items-center justify-center bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
               >
-                Clear All Data
+                Clear Data
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
