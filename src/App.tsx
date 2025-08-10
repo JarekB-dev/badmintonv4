@@ -374,7 +374,7 @@ function BadmintonManager() {
   };
 
   const handleClearAllData = () => {
-    setPlayers(prev => prev.filter(p => !p.isActive));
+    setPlayers(prev => prev.map(p => ({ ...p, isActive: false })));
     setCourtAssignments([]);
     setPartnerships([]);
     toast.success("All data cleared!");
