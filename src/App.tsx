@@ -1,5 +1,6 @@
 import { Toaster, toast } from "sonner";
 import { useState, useEffect } from "react";
+import PlayersModal from "./PlayersModal";
 
 const STORAGE_KEYS = {
   players: 'badminton-players',
@@ -161,6 +162,8 @@ function BadmintonManager() {
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isShuffling, setIsShuffling] = useState(false);
+  const [showPlayersModal, setShowPlayersModal] = useState(false);
+
 
   useEffect(() => {
     setPlayers(storage.get(STORAGE_KEYS.players, []));
@@ -353,9 +356,17 @@ function BadmintonManager() {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-      <div className="xl:col-span-1">
-        <div className="bg-white rounded-lg shadow-md p-6">
+    <>
+      {showPlayersModal && (
+        <PlayersModal
+          players={players}
+          handleTogglePlayer={handleTogglePlayer}
+          onClose={() => setShowPlayersModal(false)}
+        />
+      )}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+        <div className="xl:col-span-1">
+          <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">🏸 Player Management</h2>
           
           <form onSubmit={handleAddPlayer} className="mb-6">
@@ -379,6 +390,12 @@ function BadmintonManager() {
 
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
             <div className="flex flex-col gap-2">
+               <button
+                onClick={() => setShowPlayersModal(true)}
+                className="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 text-sm"
+              >
+                Players
+              </button>
               <button
                 onClick={handleShufflePlayers}
                 disabled={isShuffling || activePlayers.length === 0}
@@ -498,5 +515,6 @@ function BadmintonManager() {
         </div>
       </div>
     </div>
+  </>
   );
 }
