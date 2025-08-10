@@ -556,7 +556,7 @@ function BadmintonManager() {
                 type="text"
                 value={newPlayerName}
                 onChange={(e) => setNewPlayerName(e.target.value)}
-                placeholder="Enter player name"
+                placeholder="Player Name"
                 className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
