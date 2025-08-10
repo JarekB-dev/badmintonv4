@@ -22,12 +22,16 @@ export default function SittingOutTable({ players, handleTogglePlayer }: Sitting
             className="flex items-center justify-between bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium"
           >
             <span>{player.name}</span>
-            <button
-              onClick={() => handleTogglePlayer(player.id)}
-              className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
-            >
-              Resume
-            </button>
+            {!player.isActive ? (
+              <button
+                onClick={() => handleTogglePlayer(player.id)}
+                className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+              >
+                Resume
+              </button>
+            ) : (
+              <span className="text-xs text-gray-500">&mdash;</span>
+            )}
           </div>
         ))}
       </div>
