@@ -4,4 +4,5 @@ export interface Player {
   isActive: boolean;
   isPaused: boolean;
   sitOutCount: number;
+  isSaved: boolean;
 }
