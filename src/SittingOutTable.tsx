@@ -3,10 +3,10 @@ import type { Player } from "./types/Player";
 
 interface SittingOutTableProps {
   players: Player[];
-  handleTogglePlayer: (id: string) => void;
+  handlePausePlayer: (id: string) => void;
 }
 
-export default function SittingOutTable({ players, handleTogglePlayer }: SittingOutTableProps) {
+export default function SittingOutTable({ players, handlePausePlayer }: SittingOutTableProps) {
   return (
     <div className="mt-6 p-4 bg-orange-50 border border-orange-200 rounded-lg">
       <h3 className="text-lg font-semibold mb-3 text-orange-800">🪑 Sitting Out ({players.length})</h3>
@@ -17,9 +17,9 @@ export default function SittingOutTable({ players, handleTogglePlayer }: Sitting
             className="flex items-center justify-between bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium"
           >
             <span>{player.name}</span>
-            {!player.isActive ? (
+            {player.isPaused ? (
               <button
-                onClick={() => handleTogglePlayer(player.id)}
+                onClick={() => handlePausePlayer(player.id)}
                 className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
               >
                 Resume
