@@ -166,7 +166,8 @@ function BadmintonManager() {
   const [sittingOutPlayerIds, setSittingOutPlayerIds] = useState<string[]>([]);
 
   useEffect(() => {
-    setPlayers(storage.get(STORAGE_KEYS.players, []));
+    const storedPlayers = storage.get(STORAGE_KEYS.players, [] as Player[]);
+    setPlayers(storedPlayers.map(p => ({ ...p, sitOutCount: p.sitOutCount || 0 })));
     setCourtAssignments(storage.get(STORAGE_KEYS.courtAssignments, []));
     const storedPartnerships = storage.get(STORAGE_KEYS.partnerships, [] as Partnership[]);
     setPartnerships(
@@ -228,7 +229,8 @@ function BadmintonManager() {
     const newPlayer: Player = {
       id: `player_${Date.now()}_${Math.random()}`,
       name: newPlayerName.trim(),
-      isActive: true
+      isActive: true,
+      sitOutCount: 0
     };
 
     setPlayers(prev => [...prev, newPlayer]);
@@ -248,7 +250,8 @@ function BadmintonManager() {
     const newPlayer: Player = {
       id: `player_${Date.now()}_${Math.random()}`,
       name: newPlayerName.trim(),
-      isActive: false
+      isActive: false,
+      sitOutCount: 0
     };
 
     setPlayers(prev => [...prev, newPlayer]);
@@ -378,24 +381,31 @@ function BadmintonManager() {
       return teams;
     };
 
-    const sidelinedPlayers = sittingOutPlayerIds
-      .map(id => activePlayers.find(p => p.id === id))
-      .filter(Boolean) as Player[];
-    const remainingPlayers = activePlayers.filter(p => !sittingOutPlayerIds.includes(p.id));
+    const maxPlayers = 16;
+    const playablePlayers = Math.min(Math.floor(activePlayers.length / 4) * 4, maxPlayers);
+    const playersToSitOutCount = activePlayers.length - playablePlayers;
 
-    for (let i = remainingPlayers.length - 1; i > 0; i--) {
+    const randomizedPlayers = [...activePlayers];
+    for (let i = randomizedPlayers.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [remainingPlayers[i], remainingPlayers[j]] = [remainingPlayers[j], remainingPlayers[i]];
+      [randomizedPlayers[i], randomizedPlayers[j]] = [randomizedPlayers[j], randomizedPlayers[i]];
     }
 
-    const orderedPlayers = [...sidelinedPlayers, ...remainingPlayers];
+    const playersBySitOut = randomizedPlayers.sort((a, b) => a.sitOutCount - b.sitOutCount);
+    const sittingOut = playersBySitOut.slice(0, playersToSitOutCount);
+    const playersForTeams = playersBySitOut.slice(playersToSitOutCount);
 
-    const sortedPlayers = [...orderedPlayers].sort((a, b) =>
+    for (let i = playersForTeams.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [playersForTeams[i], playersForTeams[j]] = [playersForTeams[j], playersForTeams[i]];
+    }
+
+    const sortedPlayers = [...playersForTeams].sort((a, b) =>
       a.name.localeCompare(b.name)
     );
 
     const teams = assignPlayersToTeams(
-      orderedPlayers,
+      playersForTeams,
       sortedPlayers,
       recentSessionIds,
     );
@@ -429,6 +439,14 @@ function BadmintonManager() {
         }
       }
     }
+    setPlayers(prev =>
+      prev.map(p =>
+        sittingOut.some(s => s.id === p.id)
+          ? { ...p, sitOutCount: p.sitOutCount + 1 }
+          : p
+      )
+    );
+    setSittingOutPlayerIds(sittingOut.map(p => p.id));
     
     setCourtAssignments(newAssignments);
     setIsShuffling(false);
@@ -586,8 +604,13 @@ function BadmintonManager() {
               <h3 className="text-lg font-semibold mb-3 text-orange-800">🪑 Sitting Out ({sittingOutPlayers.length})</h3>
               <div className="grid grid-cols-2 gap-2">
                 {sittingOutPlayers.map((player) => (
-                  <div key={player.id} className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium text-center">
+                  <div
+                    key={player.id}
+                    title={`Sat out ${player.sitOutCount} times`}
+                    className="bg-orange-100 text-orange-800 px-3 py-2 rounded-lg text-sm font-medium text-center"
+                  >
                     {player.name}
+                    <span className="text-xs ml-1">({player.sitOutCount})</span>
                   </div>
                 ))}
               </div>
