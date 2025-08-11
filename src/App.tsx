@@ -340,9 +340,48 @@ function BadmintonManager() {
       [randomizedPlayers[i], randomizedPlayers[j]] = [randomizedPlayers[j], randomizedPlayers[i]];
     }
 
-    const playersBySitOut = randomizedPlayers.sort((a, b) => a.sitOutCount - b.sitOutCount);
-    const sittingOut = playersBySitOut.slice(0, playersToSitOutCount);
-    const playersForTeams = playersBySitOut.slice(playersToSitOutCount);
+    const playersBySitOut = randomizedPlayers.sort(
+      (a, b) => a.sitOutCount - b.sitOutCount
+    );
+    const minSitOutCount = playersBySitOut[0]?.sitOutCount ?? 0;
+    const minSitOutPlayers = playersBySitOut.filter(
+      p => p.sitOutCount === minSitOutCount
+    );
+    const prevSitOutSet = new Set(sittingOutPlayerIds);
+
+    let candidateList = minSitOutPlayers;
+    const availableNonPrev = minSitOutPlayers.filter(
+      p => !prevSitOutSet.has(p.id)
+    );
+    if (availableNonPrev.length >= playersToSitOutCount) {
+      candidateList = availableNonPrev;
+    }
+
+    let sittingOut = candidateList.slice(0, playersToSitOutCount);
+
+    if (sittingOut.length < playersToSitOutCount) {
+      const remainingNeeded = playersToSitOutCount - sittingOut.length;
+      const previouslySatPlayers = playersBySitOut.filter(
+        p => prevSitOutSet.has(p.id) && !sittingOut.some(s => s.id === p.id)
+      );
+      sittingOut = [
+        ...sittingOut,
+        ...previouslySatPlayers.slice(0, remainingNeeded),
+      ];
+    }
+
+    if (sittingOut.length < playersToSitOutCount) {
+      const remainingPlayers = playersBySitOut.filter(
+        p => !sittingOut.some(s => s.id === p.id)
+      );
+      sittingOut = [
+        ...sittingOut,
+        ...remainingPlayers.slice(0, playersToSitOutCount - sittingOut.length),
+      ];
+    }
+
+    const sittingOutIds = new Set(sittingOut.map(p => p.id));
+    const playersForTeams = playersBySitOut.filter(p => !sittingOutIds.has(p.id));
 
     for (let i = playersForTeams.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
