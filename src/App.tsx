@@ -3,12 +3,6 @@ import { useState, useEffect } from "react";
 import SittingOutTable from "./SittingOutTable";
 import type { Player } from "./types/Player";
 
-const STORAGE_KEYS = {
-  courtAssignments: 'badminton-court-assignments',
-  partnerships: 'badminton-partnerships',
-  sittingOutPlayers: 'badminton-sitting-out-players'
-};
-
 interface CourtAssignment {
   courtNumber: number;
   playerIds: string[];
@@ -25,20 +19,6 @@ interface CourtWithPlayers {
   courtNumber: number;
   players: Player[];
 }
-
-const storage = {
-  get: function<T>(key: string, defaultValue: T): T {
-    try {
-      const item = localStorage.getItem(key);
-      return item ? JSON.parse(item) : defaultValue;
-    } catch {
-      return defaultValue;
-    }
-  },
-  set: function<T>(key: string, value: T): void {
-    localStorage.setItem(key, JSON.stringify(value));
-  }
-};
 
 export default function App() {
   return (
@@ -157,28 +137,6 @@ function BadmintonManager() {
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isShuffling, setIsShuffling] = useState(false);
   const [sittingOutPlayerIds, setSittingOutPlayerIds] = useState<string[]>([]);
-
-  useEffect(() => { 
-    setCourtAssignments(storage.get(STORAGE_KEYS.courtAssignments, []));
-    const storedPartnerships = storage.get(STORAGE_KEYS.partnerships, [] as Partnership[]);
-    setPartnerships(
-      storedPartnerships.map(p => ({ ...p, lastSessions: p.lastSessions || [] }))
-    );
-    setSittingOutPlayerIds(storage.get(STORAGE_KEYS.sittingOutPlayers, []));
-  }, []);
-
-  useEffect(() => {
-    storage.set(STORAGE_KEYS.courtAssignments, courtAssignments);
-  }, [courtAssignments]);
-
-  useEffect(() => {
-    storage.set(STORAGE_KEYS.partnerships, partnerships);
-  }, [partnerships]);
-
-  useEffect(() => {
-    storage.set(STORAGE_KEYS.sittingOutPlayers, sittingOutPlayerIds);
-  }, [sittingOutPlayerIds]);
-
   const activePlayers = players.filter(p => p.isActive && !p.isPaused);
 
   const getCurrentCourtAssignments = (): CourtWithPlayers[] => {
@@ -449,17 +407,7 @@ function BadmintonManager() {
     toast.success("Courts cleared!");
   };
 
-  const handleClearAllData = () => {
-    setPlayers([]);
-    setSittingOutPlayerIds([]);
-    setCourtAssignments([]);
-    setPartnerships([]);
-    localStorage.removeItem(STORAGE_KEYS.courtAssignments);
-    localStorage.removeItem(STORAGE_KEYS.partnerships);
-    localStorage.removeItem(STORAGE_KEYS.sittingOutPlayers);
-    toast.success("All data cleared!");
-  };
-
+  
   return (
     <>
       
@@ -493,11 +441,11 @@ function BadmintonManager() {
           </form>
 
           <div className="mb-6">
-            <div className="grid grid-cols-2 grid-rows-2 sm:grid-cols-3 sm:grid-rows-1 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={handleShufflePlayers}
                 disabled={isShuffling || activePlayers.length === 0}
-                className="w-full row-span-2 sm:row-span-1 py-4 flex items-center justify-center bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold sm:aspect-square"
+                className="w-full py-4 flex items-center justify-center bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold sm:aspect-square"
               >
                 <div className="flex flex-col items-center">
                   <span className="text-4xl">{isShuffling ? "🔄" : "🔀"}</span>
@@ -511,15 +459,6 @@ function BadmintonManager() {
                 <div className="flex flex-col items-center">
                   <span className="text-5xl">🧹</span>
                   <span className="mt-1 text-xs">Clear Courts</span>
-                </div>
-              </button>
-              <button
-                onClick={handleClearAllData}
-                className="w-full py-4 flex items-center justify-center bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold sm:aspect-square"
-              >
-                <div className="flex flex-col items-center">
-                  <span className="text-4xl">🗑️</span>
-                  <span className="mt-1 text-xs">Clear Data</span>
                 </div>
               </button>
             </div>
