@@ -26,7 +26,7 @@ export default function App() {
       <main className="p-8">
         <Content />
       </main>
-      <Toaster />
+      <Toaster duration={2000} />
     </div>
   );
 }
@@ -540,7 +540,17 @@ function BadmintonManager() {
 
       <div className="xl:col-span-2">
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">🏟️ Court Assignments</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-800 text-center sm:text-left">🏟️ Court Assignments</h2>
+            <button
+              onClick={handleShufflePlayers}
+              disabled={isShuffling || activePlayers.length === 0}
+              className="mt-4 sm:mt-0 inline-flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+            >
+              <span className="mr-2">{isShuffling ? "Shuffling..." : "Shuffle"}</span>
+              <span>{isShuffling ? "🔄" : "🔀"}</span>
+            </button>
+          </div>
 
           {currentCourts.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
