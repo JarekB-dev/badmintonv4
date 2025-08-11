@@ -334,8 +334,20 @@ function BadmintonManager() {
     );
   };
 
+  const handleRemoveActivePlayer = (playerId: string) => {
+    const player = players.find(p => p.id === playerId);
+    if (!player) return;
+
+    if (player.isSaved) {
+      handleDeactivatePlayer(playerId);
+      setCourtAssignments(prev => stripPlayerFromCourts(prev, playerId));
+    } else {
+      handleRemovePlayer(playerId);
+    }
+  };
+  
   const getPartnershipCount = (p1Id: string, p2Id: string): number => {
-    const partnership = partnerships.find(p => 
+    const partnership = partnerships.find(p =>
       (p.player1Id === p1Id && p.player2Id === p2Id) ||
       (p.player1Id === p2Id && p.player2Id === p1Id)
     );
@@ -643,7 +655,7 @@ function BadmintonManager() {
                         Pause
                       </button>
                       <button
-                        onClick={() => handleRemovePlayer(player.id)}
+                        onClick={() => handleRemoveActivePlayer(player.id)}
                         className="px-4 py-2 text-sm bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300"
                       >
                         ✕
