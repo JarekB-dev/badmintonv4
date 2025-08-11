@@ -24,10 +24,7 @@ export default function PlayersModal({
               key={player.id}
               className="flex items-center justify-between p-2 bg-gray-50 rounded"
             >
-              <span className="text-gray-700">
-                {player.name}
-                <span className="text-xs ml-1 text-gray-500">({player.sitOutCount})</span>
-              </span>
+              <span className="text-gray-700">{player.name}</span>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleTogglePlayer(player.id)}
