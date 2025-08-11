@@ -601,11 +601,11 @@ function BadmintonManager() {
           </form>
 
           <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 grid-rows-2 sm:grid-cols-3 sm:grid-rows-1 gap-2">
               <button
                 onClick={handleShufflePlayers}
                 disabled={isShuffling || activePlayers.length === 0}
-                className="w-full aspect-square flex items-center justify-center bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                className="w-full row-span-2 sm:row-span-1 flex items-center justify-center bg-emerald-600 text-white rounded-md hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold sm:aspect-square"
               >
                 <div className="flex flex-col items-center">
                   <span className="text-5xl">{isShuffling ? "🔄" : "🔀"}</span>
