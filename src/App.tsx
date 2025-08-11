@@ -1,11 +1,9 @@
 import { Toaster, toast } from "sonner";
 import { useState, useEffect } from "react";
-import PlayersModal from "./PlayersModal";
 import SittingOutTable from "./SittingOutTable";
 import type { Player } from "./types/Player";
 
 const STORAGE_KEYS = {
-  players: 'badminton-players',
   courtAssignments: 'badminton-court-assignments',
   partnerships: 'badminton-partnerships',
   sittingOutPlayers: 'badminton-sitting-out-players'
@@ -158,19 +156,9 @@ function BadmintonManager() {
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [newPlayerName, setNewPlayerName] = useState("");
   const [isShuffling, setIsShuffling] = useState(false);
-  const [showPlayersModal, setShowPlayersModal] = useState(false);
   const [sittingOutPlayerIds, setSittingOutPlayerIds] = useState<string[]>([]);
 
-  useEffect(() => {
-    const storedPlayers = storage.get(STORAGE_KEYS.players, [] as Player[]);
-    setPlayers(
-      storedPlayers.map(p => ({
-        ...p,
-        sitOutCount: p.sitOutCount || 0,
-        isPaused: p.isPaused || false,
-        isSaved: p.isSaved ?? true,
-      }))
-    );
+  useEffect(() => { 
     setCourtAssignments(storage.get(STORAGE_KEYS.courtAssignments, []));
     const storedPartnerships = storage.get(STORAGE_KEYS.partnerships, [] as Partnership[]);
     setPartnerships(
@@ -178,13 +166,6 @@ function BadmintonManager() {
     );
     setSittingOutPlayerIds(storage.get(STORAGE_KEYS.sittingOutPlayers, []));
   }, []);
-
-  useEffect(() => {
-    storage.set(
-      STORAGE_KEYS.players,
-      players.filter(p => p.isSaved)
-    );
-  }, [players]);
 
   useEffect(() => {
     storage.set(STORAGE_KEYS.courtAssignments, courtAssignments);
@@ -239,42 +220,12 @@ function BadmintonManager() {
       name: newPlayerName.trim(),
       isActive: true,
       isPaused: false,
-      sitOutCount: 0,
-      isSaved: false
-    };
-
-    setPlayers(prev => [...prev, newPlayer]);
-    setNewPlayerName("");
-    toast.success("Player added successfully!");
-  };
-
-  const handleSavePlayer = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!newPlayerName.trim()) return;
-
-    if (players.some(p => p.name.toLowerCase() === newPlayerName.trim().toLowerCase())) {
-      toast.error("Player with this name already exists");
-      return;
-    }
-
-    const newPlayer: Player = {
-      id: `player_${Date.now()}_${Math.random()}`,
-      name: newPlayerName.trim(),
-      isActive: false,
-      isPaused: false,
-      isSaved: true,
       sitOutCount: 0
     };
 
     setPlayers(prev => [...prev, newPlayer]);
     setNewPlayerName("");
-    toast.success("Player saved successfully!");
-  };
-
-  const handleRemovePlayer = (playerId: string) => {
-    setPlayers(prev => prev.filter(p => p.id !== playerId));
-    setPartnerships(prev => prev.filter(p => p.player1Id !== playerId && p.player2Id !== playerId));
-    toast.success("Player removed!");
+    toast.success("Player added successfully!");
   };
 
   const stripPlayerFromCourts = (
@@ -288,24 +239,11 @@ function BadmintonManager() {
       }))
       .filter(assignment => assignment.playerIds.length > 0);
 
-  const handleTogglePlayer = (playerId: string) => {
-    const wasActive = players.find(p => p.id === playerId)?.isActive;
-
-    setPlayers(prev =>
-      prev.map(p =>
-        p.id === playerId
-          ? { ...p, isActive: !p.isActive, isPaused: false }
-          : p
-      )
-    );
-
-    if (wasActive) {
-      const updatedAssignments = stripPlayerFromCourts(
-        courtAssignments,
-        playerId,
-      );
-      setCourtAssignments(updatedAssignments);
-    }
+  const handleRemovePlayer = (playerId: string) => {
+    setPlayers(prev => prev.filter(p => p.id !== playerId));
+    setPartnerships(prev => prev.filter(p => p.player1Id !== playerId && p.player2Id !== playerId));
+    setCourtAssignments(prev => stripPlayerFromCourts(prev, playerId));
+    toast.success("Player removed!");
   };
 
   const handlePausePlayer = (playerId: string) => {
@@ -326,24 +264,8 @@ function BadmintonManager() {
     }
   };
 
-  const handleDeactivatePlayer = (playerId: string) => {
-    setPlayers(prev =>
-      prev.map(p =>
-        p.id === playerId ? { ...p, isActive: false, isPaused: false } : p
-      )
-    );
-  };
-
   const handleRemoveActivePlayer = (playerId: string) => {
-    const player = players.find(p => p.id === playerId);
-    if (!player) return;
-
-    if (player.isSaved) {
-      handleDeactivatePlayer(playerId);
-      setCourtAssignments(prev => stripPlayerFromCourts(prev, playerId));
-    } else {
-      handleRemovePlayer(playerId);
-    }
+    handleRemovePlayer(playerId);
   };
   
   const getPartnershipCount = (p1Id: string, p2Id: string): number => {
@@ -528,16 +450,7 @@ function BadmintonManager() {
   };
 
   const handleClearAllData = () => {
-    setPlayers(currentPlayers =>
-      currentPlayers
-        .filter(player => player.isSaved)
-        .map(player => ({
-          ...player,
-          isActive: false,
-          isPaused: false,
-          sitOutCount: 0
-      }))
-    );
+    setPlayers([]);
     setSittingOutPlayerIds([]);
     setCourtAssignments([]);
     setPartnerships([]);
@@ -549,21 +462,14 @@ function BadmintonManager() {
 
   return (
     <>
-      {showPlayersModal && (
-        <PlayersModal
-          players={players.filter(p => p.isSaved)}
-          handleTogglePlayer={handleTogglePlayer}
-          handleRemovePlayer={handleRemovePlayer}
-          onClose={() => setShowPlayersModal(false)}
-        />
-      )}
+      
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
         <div className="xl:col-span-1">
           <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-2xl font-bold mb-4 text-gray-800">🏸 Player Management</h2>
           
           <form onSubmit={handleAddPlayer} className="mb-6">
-            <div className="flex items-stretch gap-2 mb-2">
+            <div className="flex items-stretch mb-2">
               <input
                 type="text"
                 name="playerName"
@@ -573,29 +479,15 @@ function BadmintonManager() {
                 autoComplete="off"
                 className="flex-1 min-w-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <button
-                type="button"
-                onClick={() => setShowPlayersModal(true)}
-                className="px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 flex items-center justify-center"
-              >
-                <span className="text-2xl" role="img" aria-label="players">👤</span>
-              </button>
+              
             </div>
             <div className="flex gap-2">
               <button
                 type="submit"
                 disabled={!newPlayerName.trim()}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add
-              </button>
-              <button
-                type="button"
-                onClick={handleSavePlayer}
-                disabled={!newPlayerName.trim()}
-                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Save
               </button>
             </div>
           </form>
